@@ -5,9 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 
 import com.stedi.randomimagegenerator.DefaultFileNamePolicy;
 import com.stedi.randomimagegenerator.ImageParams;
@@ -27,16 +24,14 @@ public class TextOverlayEffect implements Generator {
          * @param imageParams Image parameters used to generate an image.
          * @return Text that will be drawn in front of image.
          */
-        @NonNull
-        String getText(@NonNull ImageParams imageParams);
+        String getText(ImageParams imageParams);
     }
 
     private static class DefaultTextPolicy implements TextPolicy {
         private static final DefaultFileNamePolicy policy = new DefaultFileNamePolicy();
 
         @Override
-        @NonNull
-        public String getText(@NonNull ImageParams imageParams) {
+        public String getText(ImageParams imageParams) {
             return policy.getName(imageParams);
         }
     }
@@ -88,8 +83,7 @@ public class TextOverlayEffect implements Generator {
          * Set target generator.
          * <p>Must not be null.</p>
          */
-        @NonNull
-        public Builder setGenerator(@NonNull Generator generator) {
+        public Builder setGenerator(Generator generator) {
             if (generator == null) {
                 throw new IllegalArgumentException("generator cannot be null");
             }
@@ -101,8 +95,7 @@ public class TextOverlayEffect implements Generator {
          * Set text policy.
          * <p>If not specified, then the default implementation will be used.</p>
          */
-        @NonNull
-        public Builder setTextPolicy(@Nullable TextPolicy textPolicy) {
+        public Builder setTextPolicy(TextPolicy textPolicy) {
             p.textPolicy = textPolicy;
             return this;
         }
@@ -110,8 +103,7 @@ public class TextOverlayEffect implements Generator {
         /**
          * To override existing {@link Paint} object for drawing text.
          */
-        @NonNull
-        public Builder setTextPaint(@Nullable Paint textPaint) {
+        public Builder setTextPaint(Paint textPaint) {
             p.textPaint = textPaint;
             return this;
         }
@@ -119,8 +111,7 @@ public class TextOverlayEffect implements Generator {
         /**
          * To override existing {@link Paint} object for drawing text background.
          */
-        @NonNull
-        public Builder setBackgroundPaint(@Nullable Paint backgroundPaint) {
+        public Builder setBackgroundPaint(Paint backgroundPaint) {
             p.backgroundPaint = backgroundPaint;
             return this;
         }
@@ -128,7 +119,6 @@ public class TextOverlayEffect implements Generator {
         /**
          * To draw text background, or not. Default is {@code true}.
          */
-        @NonNull
         public Builder setDrawBackground(boolean drawBackground) {
             p.drawBackground = drawBackground;
             return this;
@@ -137,13 +127,11 @@ public class TextOverlayEffect implements Generator {
         /**
          * To resize text based on the image size, or not. Default is {@code true}.
          */
-        @NonNull
         public Builder setAutoresizeText(boolean autoresizeText) {
             p.autoresizeText = autoresizeText;
             return this;
         }
 
-        @NonNull
         public TextOverlayEffect build() {
             if (p.generator == null) {
                 throw new IllegalStateException("generator not specified");
@@ -166,9 +154,7 @@ public class TextOverlayEffect implements Generator {
     }
 
     @Override
-    @Nullable
-    @WorkerThread
-    public Bitmap generate(@NonNull ImageParams imageParams) throws Exception {
+    public Bitmap generate(ImageParams imageParams) throws Exception {
         Bitmap bitmap = params.generator.generate(imageParams);
         if (bitmap == null) {
             return null;

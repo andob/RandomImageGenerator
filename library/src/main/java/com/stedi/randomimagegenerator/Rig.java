@@ -1,9 +1,9 @@
 package com.stedi.randomimagegenerator;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -16,13 +16,15 @@ import com.stedi.randomimagegenerator.generators.Generator;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Random Image Generator (RIG).
  */
 public final class Rig {
     private static boolean DEBUG = false;
-    private static String TAG = "RIG";
+    private static final String TAG = "RIG";
 
     final RigParams params = new RigParams();
 
@@ -36,8 +38,36 @@ public final class Rig {
     /**
      * To start images generation.
      */
-    @WorkerThread
-    public void generate() {
+    public void generateAsync() {
+        new Thread(this::generateImpl).start();
+    }
+
+    public List<Bitmap> generateBlocking() throws Exception {
+        GenerateInternalResult internalResult = generateImpl();
+        if (!internalResult.errors.isEmpty()) {
+            throw internalResult.errors.get(0);
+        }
+        return internalResult.bitmaps;
+    }
+
+    public Bitmap generateOneBlocking() throws Exception {
+        GenerateInternalResult internalResult = generateImpl();
+        if (!internalResult.errors.isEmpty()) {
+            throw internalResult.errors.get(0);
+        }
+        if (!internalResult.bitmaps.isEmpty()) {
+            return internalResult.bitmaps.get(0);
+        }
+        throw new NotGeneratedException("No bitmaps generated!");
+    }
+
+    private static final class GenerateInternalResult {
+        final List<Bitmap> bitmaps = new LinkedList<>();
+        final List<Exception> errors = new LinkedList<>();
+    }
+
+    private GenerateInternalResult generateImpl() {
+
         if (DEBUG) {
             Log.d(TAG, "Started with parameters: " + params);
         }
@@ -49,22 +79,23 @@ public final class Rig {
         isCanceled = false;
         imageId = 0;
 
+        GenerateInternalResult internalResult = new GenerateInternalResult();
         if (params.useWidthRange) {
             for (int width : params.widthRangeValues) {
                 if (params.useHeightRange) {
                     for (int height : params.heightRangeValues) {
-                        generate(width, height, 1);
+                        generateImpl(internalResult, width, height, 1);
                     }
                 } else {
-                    generate(width, params.height, 1);
+                    generateImpl(internalResult, width, params.height, 1);
                 }
             }
         } else if (params.useHeightRange) {
             for (int height : params.heightRangeValues) {
-                generate(params.width, height, 1);
+                generateImpl(internalResult, params.width, height, 1);
             }
         } else {
-            generate(params.width, params.height, params.count);
+            generateImpl(internalResult, params.width, params.height, params.count);
         }
 
         if (DEBUG) {
@@ -74,9 +105,11 @@ public final class Rig {
                 Log.d(TAG, "Ended");
             }
         }
+
+        return internalResult;
     }
 
-    private void generate(int width, int height, int count) {
+    private void generateImpl(GenerateInternalResult internalResult, int width, int height, int count) {
         for (int i = 0; i < count; i++) {
             if (isCanceled) {
                 return;
@@ -104,12 +137,14 @@ public final class Rig {
                 }
 
                 notifyGenerateCallback(imageParams, bitmap, null);
+                internalResult.bitmaps.add(bitmap);
             } catch (Exception e) {
                 if (DEBUG) {
                     Log.d(TAG, "Failed to generate", e);
                 }
 
                 notifyGenerateCallback(imageParams, null, e);
+                internalResult.errors.add(e);
             }
 
             if (params.path != null && bitmap != null) {
@@ -142,6 +177,7 @@ public final class Rig {
                     }
 
                     notifySaveCallback(bitmap, null, e);
+                    internalResult.errors.add(e);
                 }
             }
         }
@@ -176,15 +212,17 @@ public final class Rig {
      */
     private void notifyGenerateCallback(ImageParams imageParams, Bitmap bitmap, Exception e) {
         if (params.generateCallback != null) {
-            try {
-                if (e != null) {
-                    params.generateCallback.onFailedToGenerate(imageParams, e);
-                } else {
-                    params.generateCallback.onGenerated(imageParams, bitmap);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                try {
+                    if (e != null) {
+                        params.generateCallback.onFailedToGenerate(imageParams, e);
+                    } else {
+                        params.generateCallback.onGenerated(imageParams, bitmap);
+                    }
+                } catch (Exception e1) {
+                    e1.printStackTrace();
                 }
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
+            });
         }
     }
 
@@ -197,15 +235,17 @@ public final class Rig {
      */
     private void notifySaveCallback(Bitmap bitmap, File path, Exception e) {
         if (params.saveCallback != null) {
-            try {
-                if (e != null) {
-                    params.saveCallback.onFailedToSave(bitmap, e);
-                } else {
-                    params.saveCallback.onSaved(bitmap, path);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                try {
+                    if (e != null) {
+                        params.saveCallback.onFailedToSave(bitmap, e);
+                    } else {
+                        params.saveCallback.onSaved(bitmap, path);
+                    }
+                } catch (Exception e1) {
+                    e1.printStackTrace();
                 }
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
+            });
         }
     }
 
@@ -247,14 +287,13 @@ public final class Rig {
      * @param to   Must be bigger than 0. Always present in the return array as the last item.
      * @param step Must be bigger than 0.
      */
-    @NonNull
     public static int[] createRangeArray(int from, int to, int step) {
         if (step <= 0 || from <= 0 || to <= 0) {
             throw new IllegalArgumentException("all args must be bigger than 0");
         }
 
         boolean isDecreasing = to < from;
-        int size = (int) Math.ceil(Math.abs((1f * to - from) / step * 1f));
+        int size = (int) Math.ceil(Math.abs((1f * to - from) / step));
         if (size == 0) {
             size = 1;
         }
@@ -334,8 +373,7 @@ public final class Rig {
          * @param generator Interface definition for a generator, that is used to generate images.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
-        public Builder setGenerator(@NonNull Generator generator) {
+        public Builder setGenerator(Generator generator) {
             if (generator == null) {
                 throw new IllegalArgumentException("generator cannot be null");
             }
@@ -350,8 +388,7 @@ public final class Rig {
          * @param palette Color palette for images generation.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
-        public Builder setPalette(@Nullable RigPalette palette) {
+        public Builder setPalette(RigPalette palette) {
             p.palette = palette;
             return this;
         }
@@ -362,8 +399,7 @@ public final class Rig {
          * @param generateCallback Interface definition for a callback to be invoked when an image is generated or not.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
-        public Builder setCallback(@Nullable GenerateCallback generateCallback) {
+        public Builder setCallback(GenerateCallback generateCallback) {
             p.generateCallback = generateCallback;
             return this;
         }
@@ -375,8 +411,7 @@ public final class Rig {
          * @param quality A specified quality to use for bitmaps generation and compression.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
-        public Builder setQuality(@Nullable Quality quality) {
+        public Builder setQuality(Quality quality) {
             p.quality = quality;
             return this;
         }
@@ -389,7 +424,6 @@ public final class Rig {
          * @param height Must be bigger than 0.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
         public Builder setFixedSize(int width, int height) {
             return setFixedWidth(width).setFixedHeight(height);
         }
@@ -401,7 +435,6 @@ public final class Rig {
          * @param width Must be bigger than 0.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
         public Builder setFixedWidth(int width) {
             if (width <= 0) {
                 throw new IllegalArgumentException("width must be bigger than 0");
@@ -418,7 +451,6 @@ public final class Rig {
          * @param height Must be bigger than 0.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
         public Builder setFixedHeight(int height) {
             if (height <= 0) {
                 throw new IllegalArgumentException("height must be bigger than 0");
@@ -440,7 +472,6 @@ public final class Rig {
          * @param step Step width in array. Must be bigger than 0.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
         public Builder setWidthRange(int from, int to, int step) {
             if (step <= 0 || from <= 0 || to <= 0) {
                 throw new IllegalArgumentException("all width range args must be bigger than 0");
@@ -465,7 +496,6 @@ public final class Rig {
          * @param step Step height in array. Must be bigger than 0.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
         public Builder setHeightRange(int from, int to, int step) {
             if (step <= 0 || from <= 0 || to <= 0) {
                 throw new IllegalArgumentException("all height range args must be bigger than 0");
@@ -486,7 +516,6 @@ public final class Rig {
          * @param count Must be bigger than 0.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
         public Builder setCount(int count) {
             if (p.useWidthRange || p.useHeightRange) {
                 throw new IllegalStateException("count can not be set with size range");
@@ -504,8 +533,7 @@ public final class Rig {
          *
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
-        public Builder setFileSavePath(@Nullable String path) {
+        public Builder setFileSavePath(String path) {
             if (path == null) {
                 p.path = null;
                 return this;
@@ -529,8 +557,7 @@ public final class Rig {
          * @param fileNamePolicy Used to save images with the corresponding names retrieved from it.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
-        public Builder setFileNamePolicy(@Nullable FileNamePolicy fileNamePolicy) {
+        public Builder setFileNamePolicy(FileNamePolicy fileNamePolicy) {
             p.fileNamePolicy = fileNamePolicy;
             return this;
         }
@@ -541,8 +568,7 @@ public final class Rig {
          * @param saveCallback Interface definition for a callback to be invoked when an image is saved.
          * @return This Builder object to allow for chaining of calls to set methods.
          */
-        @NonNull
-        public Builder setFileSaveCallback(@Nullable SaveCallback saveCallback) {
+        public Builder setFileSaveCallback(SaveCallback saveCallback) {
             p.saveCallback = saveCallback;
             return this;
         }
@@ -553,7 +579,6 @@ public final class Rig {
          *
          * @return A new instance of {@link Rig}.
          */
-        @NonNull
         public Rig build() {
             if (p.generator == null) {
                 throw new IllegalStateException("generator not specified");

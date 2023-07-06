@@ -1,7 +1,7 @@
 package com.stedi.randomimagegenerator;
 
 import android.graphics.Bitmap;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.stedi.randomimagegenerator.generators.ColoredNoiseGenerator;
 
@@ -21,19 +21,19 @@ public class ColoredNoiseGeneratorTest {
         try {
             new ColoredNoiseGenerator(null, null, -1);
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             new ColoredNoiseGenerator(ColoredNoiseGenerator.Orientation.HORIZONTAL, null, -1);
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             new ColoredNoiseGenerator(ColoredNoiseGenerator.Orientation.HORIZONTAL, ColoredNoiseGenerator.Type.TYPE_1, -1);
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
         }
     }
 

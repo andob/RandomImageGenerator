@@ -1,7 +1,6 @@
 package com.stedi.randomimagegenerator.callbacks;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
 
 import com.stedi.randomimagegenerator.ImageParams;
 
@@ -15,7 +14,7 @@ public interface GenerateCallback {
      * @param imageParams The parameters that were used to generate image.
      * @param bitmap      The image that was generated.
      */
-    void onGenerated(@NonNull ImageParams imageParams, @NonNull Bitmap bitmap);
+    void onGenerated(ImageParams imageParams, Bitmap bitmap);
 
     /**
      * Called when an image is not generated.
@@ -23,5 +22,5 @@ public interface GenerateCallback {
      * @param imageParams The parameters that were used to generate image.
      * @param e           The detailed exception.
      */
-    void onFailedToGenerate(@NonNull ImageParams imageParams, @NonNull Exception e);
+    void onFailedToGenerate(ImageParams imageParams, Exception e);
 }

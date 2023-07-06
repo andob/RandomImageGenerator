@@ -1,9 +1,6 @@
 package com.stedi.randomimagegenerator.generators;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 
 import com.stedi.randomimagegenerator.ImageParams;
 import com.stedi.randomimagegenerator.Rig;
@@ -19,18 +16,16 @@ public class GeneratorPack implements Generator {
     public GeneratorPack() {
     }
 
-    public GeneratorPack(@NonNull List<Generator> pack) {
+    public GeneratorPack(List<Generator> pack) {
         this.pack = pack;
     }
 
-    public void set(@NonNull List<Generator> pack) {
+    public void set(List<Generator> pack) {
         this.pack = pack;
     }
 
-    @Nullable
     @Override
-    @WorkerThread
-    public Bitmap generate(@NonNull ImageParams imageParams) throws Exception {
+    public Bitmap generate(ImageParams imageParams) throws Exception {
         return pack.get((int) Rig.random(pack.size())).generate(imageParams);
     }
 

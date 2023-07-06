@@ -1,7 +1,9 @@
 package com.stedi.randomimagegenerator.sample;
 
 import android.graphics.Bitmap;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -22,6 +24,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.Holder> {
         notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new Holder((ImageView) LayoutInflater.from(parent.getContext()).inflate(R.layout.image_item, parent, false));
@@ -37,7 +40,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.Holder> {
         return images.size();
     }
 
-    public class Holder extends RecyclerView.ViewHolder {
+    public static final class Holder extends RecyclerView.ViewHolder {
         private final ImageView imageView;
 
         public Holder(ImageView itemView) {

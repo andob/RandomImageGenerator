@@ -1,7 +1,6 @@
 package com.stedi.randomimagegenerator;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
 
 import com.stedi.randomimagegenerator.callbacks.SaveCallback;
 import com.stedi.randomimagegenerator.generators.FlatColorGenerator;
@@ -13,12 +12,12 @@ import java.io.File;
 public class BuilderExceptionsTest {
     private final SaveCallback emptySaveCallback = new SaveCallback() {
         @Override
-        public void onSaved(@NonNull Bitmap bitmap, @NonNull File file) {
+        public void onSaved(Bitmap bitmap, File file) {
 
         }
 
         @Override
-        public void onFailedToSave(@NonNull Bitmap bitmap, @NonNull Exception e) {
+        public void onFailedToSave(Bitmap bitmap, Exception e) {
 
         }
     };

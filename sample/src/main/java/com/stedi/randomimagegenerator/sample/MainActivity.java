@@ -3,13 +3,12 @@ package com.stedi.randomimagegenerator.sample;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -79,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements
         spQualityFormat.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, new String[]{
                 Bitmap.CompressFormat.PNG.name(),
                 Bitmap.CompressFormat.JPEG.name(),
-                Bitmap.CompressFormat.WEBP.name()
+                Bitmap.CompressFormat.WEBP_LOSSY.name()
         }));
 
         cbTextOverlay = findViewById(R.id.main_activity_cb_text_overlay);
@@ -112,113 +111,81 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onClick(View v) {
         imagesAdapter.clear();
-        switch (v.getId()) {
-            case R.id.main_activity_btn_generate_1:
-                generate(1);
-                break;
-            case R.id.main_activity_btn_generate_6:
-                generate(6);
-                break;
-            case R.id.main_activity_btn_generate_30:
-                generate(30);
-                break;
-            case R.id.main_activity_btn_generate_range:
-                generate(-1);
-                break;
-        }
+        if (v.getId() == R.id.main_activity_btn_generate_1) generate(1);
+        else if (v.getId() == R.id.main_activity_btn_generate_6) generate(6);
+        else if (v.getId() == R.id.main_activity_btn_generate_30) generate(30);
+        else if (v.getId() == R.id.main_activity_btn_generate_range) generate(-1);
     }
 
     private void generate(final int count) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                Generator generator = selectedGenerator;
+        Generator generator = selectedGenerator;
 
-                if (cbThreshold.isChecked()) {
-                    generator = new ThresholdEffect(generator);
-                }
+        if (cbThreshold.isChecked()) {
+            generator = new ThresholdEffect(generator);
+        }
 
-                if (cbMirrored.isChecked()) {
-                    generator = new MirroredEffect(generator);
-                }
+        if (cbMirrored.isChecked()) {
+            generator = new MirroredEffect(generator);
+        }
 
-                if (cbTextOverlay.isChecked()) {
-                    generator = new TextOverlayEffect.Builder()
-                            .setGenerator(generator).build();
-                }
+        if (cbTextOverlay.isChecked()) {
+            generator = new TextOverlayEffect.Builder()
+                    .setGenerator(generator).build();
+        }
 
-                Rig.Builder builder = new Rig.Builder()
-                        .setCallback(MainActivity.this)
-                        .setGenerator(generator)
-                        .setQuality(new Quality(selectedQualityFormat, 100));
+        Rig.Builder builder = new Rig.Builder()
+                .setCallback(MainActivity.this)
+                .setGenerator(generator)
+                .setQuality(new Quality(selectedQualityFormat, 100));
 
-                if (count > 0) {
-                    builder.setFixedSize(600, 600);
-                    builder.setCount(count);
-                } else {
-                    builder.setHeightRange(400, 1000, 200);
-                    builder.setWidthRange(800, 500, 100);
-                }
+        if (count > 0) {
+            builder.setFixedSize(600, 600);
+            builder.setCount(count);
+        } else {
+            builder.setHeightRange(400, 1000, 200);
+            builder.setWidthRange(800, 500, 100);
+        }
 
-                if (cbSaveFile.isChecked()) {
-                    String picturesFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath();
-                    builder.setFileSavePath(picturesFolder + File.separator + "rig");
-                    builder.setFileSaveCallback(MainActivity.this);
-                }
+        if (cbSaveFile.isChecked()) {
+            String picturesFolder = getFilesDir().getAbsolutePath();
+            builder.setFileSavePath(picturesFolder + File.separator + "rig");
+            builder.setFileSaveCallback(MainActivity.this);
+        }
 
-                builder.build().generate();
-            }
-        });
+        builder.build().generateAsync();
     }
 
     @Override
     public void onGenerated(@NonNull ImageParams imageParams, @NonNull final Bitmap bitmap) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                imagesAdapter.add(bitmap);
-                recyclerView.scrollToPosition(imagesAdapter.getItemCount() - 1);
-            }
-        });
+        imagesAdapter.add(bitmap);
+        recyclerView.scrollToPosition(imagesAdapter.getItemCount() - 1);
     }
 
     @Override
     public void onFailedToGenerate(@NonNull final ImageParams imageParams, @NonNull final Exception e) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                e.printStackTrace();
-                Toast.makeText(MainActivity.this, "failed to generate id " + imageParams.getId(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        e.printStackTrace();
+        Toast.makeText(MainActivity.this, "failed to generate id " + imageParams.getId(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSaved(@NonNull Bitmap bitmap, @NonNull File file) {
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
     }
 
     @Override
     public void onFailedToSave(@NonNull Bitmap bitmap, @NonNull final Exception e) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                e.printStackTrace();
-                Toast.makeText(MainActivity.this, "failed to save image", Toast.LENGTH_SHORT).show();
-            }
-        });
+        e.printStackTrace();
+        Toast.makeText(MainActivity.this, "failed to save image", Toast.LENGTH_SHORT).show();
     }
 
     private Generator generatorFactory(String className) {
         switch (className) {
             case "GeneratorPack":
-                return new GeneratorPack(new ArrayList<>(Arrays.asList(new Generator[]{
-                        generatorFactory("ColoredPixelsGenerator"),
-                        generatorFactory("ColoredNoiseGenerator"),
-                        generatorFactory("ColoredCirclesGenerator"),
-                        generatorFactory("ColoredRectangleGenerator"),
-                        generatorFactory("ColoredLinesGenerator"),
-                })));
+                return new GeneratorPack(new ArrayList<>(Arrays.asList(
+                    generatorFactory("ColoredPixelsGenerator"),
+                    generatorFactory("ColoredNoiseGenerator"),
+                    generatorFactory("ColoredCirclesGenerator"),
+                    generatorFactory("ColoredRectangleGenerator"),
+                    generatorFactory("ColoredLinesGenerator"))));
             case "FlatColorGenerator":
                 return new FlatColorGenerator();
             case "ColoredPixelsGenerator":

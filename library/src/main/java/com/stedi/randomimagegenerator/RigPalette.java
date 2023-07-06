@@ -1,8 +1,6 @@
 package com.stedi.randomimagegenerator;
 
 import android.graphics.Color;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
 
 /**
  * Is used by generators to generate images with specified palette.
@@ -21,7 +19,6 @@ public class RigPalette {
     /**
      * @return Palette with all available HSV colors.
      */
-    @NonNull
     public static RigPalette allColors() {
         return new RigPalette(0f, 360f, true, true);
     }
@@ -29,8 +26,7 @@ public class RigPalette {
     /**
      * @return Palette from one hue color, but with saturation and lightness. Hue color is picked from the passed ARGB color.
      */
-    @NonNull
-    public static RigPalette fromColor(@ColorInt int color) {
+    public static RigPalette fromColor(int color) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
         return new RigPalette(hsv[0], hsv[0], true, true);
@@ -41,7 +37,6 @@ public class RigPalette {
      * @param hueTo   0..360.
      * @return Palette from one hue color to another hue color. Without saturation and lightness.
      */
-    @NonNull
     public static RigPalette hueRange(float hueFrom, float hueTo) {
         return new RigPalette(hueFrom, hueTo, false, false);
     }
@@ -49,7 +44,6 @@ public class RigPalette {
     /**
      * @return Black and white palette (grayscale).
      */
-    @NonNull
     public static RigPalette blackAndWhite() {
         RigPalette palette = new RigPalette(0f, 0f, false, false);
         palette.setBlackAndWhite(true);
@@ -136,7 +130,6 @@ public class RigPalette {
     /**
      * Will return random RGB color from the palette.
      */
-    @ColorInt
     public int getRandom() {
         if (isBlackAndWhite) {
             hsv[0] = 0f;

@@ -1,6 +1,5 @@
 package com.stedi.randomimagegenerator;
 
-import android.support.annotation.NonNull;
 
 import com.stedi.randomimagegenerator.callbacks.GenerateCallback;
 import com.stedi.randomimagegenerator.callbacks.SaveCallback;
@@ -167,7 +166,7 @@ class RigParams {
      */
     SaveCallback saveCallback;
 
-    void apply(@NonNull RigParams from) {
+    void apply(RigParams from) {
         generator = from.generator;
         palette = from.palette;
         generateCallback = from.generateCallback;

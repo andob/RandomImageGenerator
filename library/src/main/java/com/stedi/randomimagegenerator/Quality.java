@@ -1,7 +1,6 @@
 package com.stedi.randomimagegenerator;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
 
 /**
  * A specified quality to use for bitmaps generation and compression.
@@ -15,7 +14,6 @@ public class Quality {
      *
      * @return The default PNG quality.
      */
-    @NonNull
     public static Quality png() {
         return new Quality(Bitmap.CompressFormat.PNG, 100);
     }
@@ -27,7 +25,6 @@ public class Quality {
      *                small size, 100 meaning compress for max quality.
      * @return JPEG quality instance.
      */
-    @NonNull
     public static Quality jpg(int quality) {
         return new Quality(Bitmap.CompressFormat.JPEG, quality);
     }
@@ -40,7 +37,7 @@ public class Quality {
      *               small size, 100 meaning compress for max quality.
      *               PNG will ignore the quality setting.
      */
-    public Quality(@NonNull Bitmap.CompressFormat format, int value) {
+    public Quality(Bitmap.CompressFormat format, int value) {
         setFormat(format);
         setQualityValue(value);
     }
@@ -48,7 +45,6 @@ public class Quality {
     /**
      * @return Quality compress format.
      */
-    @NonNull
     public Bitmap.CompressFormat getFormat() {
         return format;
     }
@@ -57,7 +53,7 @@ public class Quality {
      * To set quality compress format.
      * <p> If set {@link Bitmap.CompressFormat#PNG}, the quality value will be 100. </p>
      */
-    public void setFormat(@NonNull Bitmap.CompressFormat format) {
+    public void setFormat(Bitmap.CompressFormat format) {
         if (format == null) {
             throw new IllegalArgumentException("format cannot not be null");
         }
@@ -91,7 +87,6 @@ public class Quality {
     /**
      * @return File extension based on the quality format.
      */
-    @NonNull
     public String getFileExtension() {
         switch (getFormat()) {
             case JPEG:

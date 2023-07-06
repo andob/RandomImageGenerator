@@ -1,7 +1,8 @@
 package com.stedi.randomimagegenerator;
 
+import static org.junit.Assert.*;
+
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
 
 import com.stedi.randomimagegenerator.callbacks.GenerateCallback;
 import com.stedi.randomimagegenerator.callbacks.SaveCallback;
@@ -12,29 +13,27 @@ import org.junit.Test;
 
 import java.io.File;
 
-import static junit.framework.Assert.*;
-
 public class BuilderTest {
     private final SaveCallback emptySaveCallback = new SaveCallback() {
         @Override
-        public void onSaved(@NonNull Bitmap bitmap, @NonNull File file) {
+        public void onSaved(Bitmap bitmap, File file) {
 
         }
 
         @Override
-        public void onFailedToSave(@NonNull Bitmap bitmap, @NonNull Exception e) {
+        public void onFailedToSave(Bitmap bitmap, Exception e) {
 
         }
     };
 
     private final GenerateCallback emptyGenerateCallback = new GenerateCallback() {
         @Override
-        public void onGenerated(@NonNull ImageParams imageParams, @NonNull Bitmap bitmap) {
+        public void onGenerated(ImageParams imageParams, Bitmap bitmap) {
 
         }
 
         @Override
-        public void onFailedToGenerate(@NonNull ImageParams imageParams, @NonNull Exception e) {
+        public void onFailedToGenerate(ImageParams imageParams, Exception e) {
 
         }
     };

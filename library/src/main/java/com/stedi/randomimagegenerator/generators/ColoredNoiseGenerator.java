@@ -9,9 +9,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 
 import com.stedi.randomimagegenerator.ImageParams;
 import com.stedi.randomimagegenerator.Rig;
@@ -58,7 +55,7 @@ public class ColoredNoiseGenerator implements Generator {
     /**
      * Constructor with specified orientation and type, with pixel multiplier set to 2.
      */
-    public ColoredNoiseGenerator(@NonNull Orientation orientation, @NonNull Type type) {
+    public ColoredNoiseGenerator(Orientation orientation, Type type) {
         this(orientation, type, 2);
     }
 
@@ -67,7 +64,7 @@ public class ColoredNoiseGenerator implements Generator {
      *
      * @param pixelMultiplier Must be bigger than 0.
      */
-    public ColoredNoiseGenerator(@NonNull Orientation orientation, @NonNull Type type, int pixelMultiplier) {
+    public ColoredNoiseGenerator(Orientation orientation, Type type, int pixelMultiplier) {
         if (orientation == null || type == null) {
             throw new IllegalArgumentException("arguments must not be null");
         }
@@ -80,9 +77,7 @@ public class ColoredNoiseGenerator implements Generator {
     }
 
     @Override
-    @Nullable
-    @WorkerThread
-    public Bitmap generate(@NonNull ImageParams imageParams) throws Exception {
+    public Bitmap generate(ImageParams imageParams) throws Exception {
         Bitmap bitmap = Bitmap.createBitmap(imageParams.getWidth(), imageParams.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 

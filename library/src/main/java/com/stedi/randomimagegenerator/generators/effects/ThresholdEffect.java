@@ -6,9 +6,6 @@ import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 
 import com.stedi.randomimagegenerator.ImageParams;
 import com.stedi.randomimagegenerator.generators.Generator;
@@ -34,7 +31,7 @@ public class ThresholdEffect implements Generator {
      *
      * @param generator The target generator.
      */
-    public ThresholdEffect(@NonNull Generator generator) {
+    public ThresholdEffect(Generator generator) {
         this(generator, Color.BLACK, Color.WHITE);
     }
 
@@ -45,7 +42,7 @@ public class ThresholdEffect implements Generator {
      * @param colorA    The first threshold color.
      * @param colorB    The second threshold color.
      */
-    public ThresholdEffect(@NonNull Generator generator, int colorA, int colorB) {
+    public ThresholdEffect(Generator generator, int colorA, int colorB) {
         if (generator == null) {
             throw new IllegalArgumentException("target generator must not be null");
         }
@@ -54,10 +51,8 @@ public class ThresholdEffect implements Generator {
         this.colorB = colorB;
     }
 
-    @Nullable
     @Override
-    @WorkerThread
-    public Bitmap generate(@NonNull ImageParams imageParams) throws Exception {
+    public Bitmap generate(ImageParams imageParams) throws Exception {
         Bitmap targetBitmap = generator.generate(imageParams);
         if (targetBitmap == null) {
             return null;

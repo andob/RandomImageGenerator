@@ -1,9 +1,6 @@
 package com.stedi.randomimagegenerator.generators;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 
 import com.stedi.randomimagegenerator.ImageParams;
 import com.stedi.randomimagegenerator.Rig;
@@ -19,7 +16,5 @@ public interface Generator {
      * @return Bitmap object, or null.
      * @throws Exception If any.
      */
-    @Nullable
-    @WorkerThread
-    Bitmap generate(@NonNull ImageParams imageParams) throws Exception;
+    Bitmap generate(ImageParams imageParams) throws Exception;
 }

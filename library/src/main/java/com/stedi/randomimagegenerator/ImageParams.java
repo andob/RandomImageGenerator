@@ -1,7 +1,5 @@
 package com.stedi.randomimagegenerator;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.io.File;
 
@@ -16,7 +14,7 @@ public class ImageParams {
     private final RigPalette palette;
     private final FileNamePolicy fileNamePolicy;
 
-    ImageParams(int id, int width, int height, @Nullable File path, @NonNull Quality quality, @NonNull RigPalette palette, @Nullable FileNamePolicy fileNamePolicy) {
+    ImageParams(int id, int width, int height, File path, Quality quality, RigPalette palette, FileNamePolicy fileNamePolicy) {
         this.id = id;
         this.width = width;
         this.height = height;
@@ -50,7 +48,6 @@ public class ImageParams {
     /**
      * @return The path where image should be saved.
      */
-    @Nullable
     public File getPath() {
         return path;
     }
@@ -58,7 +55,6 @@ public class ImageParams {
     /**
      * @return The quality of requested image.
      */
-    @NonNull
     public Quality getQuality() {
         return quality;
     }
@@ -66,7 +62,6 @@ public class ImageParams {
     /**
      * @return The palette of requested image.
      */
-    @NonNull
     public RigPalette getPalette() {
         return palette;
     }
@@ -74,7 +69,6 @@ public class ImageParams {
     /**
      * @return The file name policy of requested image.
      */
-    @Nullable
     public FileNamePolicy getFileNamePolicy() {
         return fileNamePolicy;
     }

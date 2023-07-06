@@ -1,48 +1,45 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
-
-publish {
-    userOrg = 'stedi'
-    groupId = 'com.stedi.randomimagegenerator'
-    artifactId = 'rig'
-    publishVersion = '1.1.0'
-    repoName = 'RandomImageGenerator'
-    uploadName = 'RandomImageGenerator'
-    desc = 'Random image generator for Android'
-    website = 'https://github.com/stedi-akk/RandomImageGenerator'
-}
+apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.3'
-
+    namespace "com.stedi.randomimagegenerator"
+    compileSdk 33
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 26
-        versionCode 3
-        versionName "1.1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        targetSdk 33
+        minSdk 21
     }
-}
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.novoda:bintray-release:0.8.0'
+    publishing {
+        singleVariant("release") {}
     }
 }
 
 dependencies {
-    implementation "com.android.support:support-annotations:27.0.2"
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "org.mockito:mockito-core:5.3.1"
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation "org.mockito:mockito-core:2.12.0"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'org.mockito:mockito-core:5.3.1'
+}
 
-    androidTestImplementation 'com.android.support:support-annotations:27.0.2'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test:rules:1.0.1'
-    androidTestImplementation 'org.mockito:mockito-core:2.12.0'
-    androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito:2.12.1'
+project.afterEvaluate {
+    publishing {
+        publications {
+            repositories.maven {
+                url 'https://maven.andob.info/repository/open_source/'
+                credentials {
+                    username "$System.env.MAVEN_PUBLISH_USERNAME"
+                    password "$System.env.MAVEN_PUBLISH_PASSWORD"
+                }
+            }
+
+            release(MavenPublication) {
+                from components.release
+                groupId 'ro.andob.randomimage'
+                artifactId 'generator'
+                version '1.0.0'
+            }
+        }
+    }
 }

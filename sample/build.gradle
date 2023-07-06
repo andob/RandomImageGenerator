@@ -1,15 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.3'
-
+    namespace "com.stedi.randomimagegenerator.sample"
+    compileSdk 33
     defaultConfig {
         applicationId "com.stedi.randomimagegenerator.sample"
-        minSdkVersion 16
-        targetSdkVersion 22 // I'm too lazy to deal with permissions
-        versionCode 1
-        versionName "1.0"
+        targetSdk 33
+        minSdk 21
     }
 
     buildTypes {
@@ -21,8 +18,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.stedi.randomimagegenerator:rig:1.1.0'
-
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:recyclerview-v7:26.1.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
+    implementation project(":library")
 }

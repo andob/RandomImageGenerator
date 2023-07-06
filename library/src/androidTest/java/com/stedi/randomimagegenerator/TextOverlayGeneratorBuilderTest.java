@@ -1,8 +1,7 @@
 package com.stedi.randomimagegenerator;
 
 import android.graphics.Paint;
-import android.support.annotation.NonNull;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.stedi.randomimagegenerator.generators.FlatColorGenerator;
 import com.stedi.randomimagegenerator.generators.TextOverlayGenerator;
@@ -15,12 +14,7 @@ import static junit.framework.Assert.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
 public class TextOverlayGeneratorBuilderTest {
-    private final TextOverlayGenerator.TextPolicy textPolicy = new TextOverlayGenerator.TextPolicy() {
-        @Override
-        public String getText(@NonNull ImageParams imageParams) {
-            return "text";
-        }
-    };
+    private final TextOverlayGenerator.TextPolicy textPolicy = imageParams -> "text";
 
     @Test(expected = IllegalStateException.class)
     public void buildExceptionWithoutParams() {

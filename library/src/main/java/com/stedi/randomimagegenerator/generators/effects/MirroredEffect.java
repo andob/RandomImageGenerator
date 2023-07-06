@@ -3,9 +3,6 @@ package com.stedi.randomimagegenerator.generators.effects;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 
 import com.stedi.randomimagegenerator.ImageParams;
 import com.stedi.randomimagegenerator.generators.Generator;
@@ -21,7 +18,7 @@ public class MirroredEffect implements Generator {
     /**
      * @param generator The target generator.
      */
-    public MirroredEffect(@NonNull Generator generator) {
+    public MirroredEffect(Generator generator) {
         if (generator == null) {
             throw new IllegalArgumentException("target generator must not be null");
         }
@@ -29,9 +26,7 @@ public class MirroredEffect implements Generator {
     }
 
     @Override
-    @Nullable
-    @WorkerThread
-    public Bitmap generate(@NonNull ImageParams imageParams) throws Exception {
+    public Bitmap generate(ImageParams imageParams) throws Exception {
         Bitmap targetBitmap = generator.generate(imageParams);
         if (targetBitmap == null) {
             return null;
