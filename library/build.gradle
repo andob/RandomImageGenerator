@@ -3,10 +3,15 @@ apply plugin: 'maven-publish'
 
 android {
     namespace "com.stedi.randomimagegenerator"
-    compileSdk 33
+    compileSdk 35
     defaultConfig {
-        targetSdk 33
+        targetSdk 35
         minSdk 21
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     publishing {
@@ -15,11 +20,13 @@ android {
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito:mockito-core:5.3.1"
 
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test:rules:1.6.1'
     androidTestImplementation 'org.mockito:mockito-core:5.3.1'
 }
 
@@ -38,7 +45,7 @@ project.afterEvaluate {
                 from components.release
                 groupId 'ro.andob.randomimage'
                 artifactId 'generator'
-                version '1.0.0'
+                version '1.0.1'
             }
         }
     }

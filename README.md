@@ -124,7 +124,7 @@ RigPalette.fromColor(Color.BLUE)
 ## Download
 Gradle:
 ```groovy
-compile 'com.stedi.randomimagegenerator:rig:1.1.0'
+implementation 'ro.andob.randomimage:generator:1.0.1'
 ```
    
 There is also a sample application available in the [/sample](https://github.com/stedi-akk/RandomImageGenerator/tree/master/sample) directory.
